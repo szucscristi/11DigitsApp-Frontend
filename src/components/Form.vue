@@ -1,37 +1,53 @@
 <script setup>
 import { ref } from "vue";
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import axios from "axios";
+
 
 const nume = ref("");
 const prenume = ref("");
-const dataDeNastere = ref("");
-const comentariu = ref("");
+const email = ref("");
+const telefon = ref("");
+const adresa = ref("");
 
 onMounted(() => {
   console.log("Component mounted.");
 });
 
 async function formSubmit() {
-
-  let currentObj = this;
-
-  axios
-    .post("http://laravel.test/forms", {
+  try {
+    await axios.post("http://fashionseekersbackend.test/forms", {
       Nume: nume.value,
       Prenume: prenume.value,
-      Data_de_nastere: dataDeNastere.value,
-      Comentariu: comentariu.value,
-    })
-    .then(function (response) {
-      currentObj.output = response.data;
-    })
-    .catch(function (error) {
-      currentObj.output = error;
+      Email: email.value,
+      Telefon: telefon.value,
+      Adresa: adresa.value,
     });
-
-    console.log("in functia de trimitere");
+    
+    sendEmail(storedData.value);
+  } catch (error) {
+    console.error(error);
+  }
 }
+
+async function sendEmail(cartItems) {
+  try {
+    const response = await axios.post("http://fashionseekersbackend.test/send-mail", {
+      cartItems,
+    });
+    console.log("Email sent successfully");
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
+
+const storedData = computed(() => {
+  const storedData = localStorage.getItem("data");
+  if (storedData) {
+    return JSON.parse(storedData);
+  }
+  return [];
+});
 </script>
 
 <template>
@@ -39,24 +55,32 @@ async function formSubmit() {
     <div class="row justify-content-center">
       <div class="col-md-8 mt-3">
         <div class="card">
-          <div class="card-header">Formular</div>
+          <div class="card-header">Formular de livrare</div>
 
           <div class="card-body">
             <div>
-                <strong>Nume:</strong>
-                <input type="text" class="form-control" v-model="nume" />
-                <br>
-                <strong>Prenume:</strong>
-                <input type="text" class="form-control" v-model="prenume" />
-                <br>
-                <strong>Data de naștere:</strong>
-                <input type="text" class="form-control" v-model="dataDeNastere" />
-                <br>
-                <strong>Comentariu:</strong>
-                <input type="text" class="form-control" v-model="comentariu" />
-                <br>
+              <strong>Nume:</strong>
+              <input type="text" class="form-control" v-model="nume" />
+              <br />
+              <strong>Prenume:</strong>
+              <input type="text" class="form-control" v-model="prenume" />
+              <br />
+              <strong>Email:</strong>
+              <input type="text" class="form-control" v-model="email" />
+              <br />
+              <strong>Numar telefon:</strong>
+              <input type="text" class="form-control" v-model="telefon" />
+              <br />
+              <strong>Adresa livrare:</strong>
+              <input type="text" class="form-control" v-model="adresa" />
+              <br />
 
-                <button class="btn btn-success" @click="formSubmit()">Trimite</button>
+              <button class="btn btn-success" @click="formSubmit()">
+                Plaseaza comanda
+              </button>
+              <router-link to="/coscumparaturi" class="back-to-shoppingcart"
+                >Inapoi la cosul de cumparaturi</router-link
+              >
             </div>
           </div>
         </div>
@@ -65,8 +89,5 @@ async function formSubmit() {
   </div>
 </template>
 
-<style scoped>
-.read-the-docs {
-  color: #888;
-}
+<style>
 </style>

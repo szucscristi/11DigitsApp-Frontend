@@ -1,13 +1,17 @@
 <script setup>
-//import HelloWorld from './components/Form.vue'
-import Categorii from './components/Categorii.vue'
+
+import Homepage from './components/Homepage.vue';
+import router from './router/index.js';
+import {RouterView} from "vue-router";
+
 </script>
 
 <template>
-  <Categorii />
   
+  <RouterView />
 </template>
 
-<style >
+<style>
 @import 'bootstrap/dist/css/bootstrap.css';
+@import 'style.css';
 </style>
